@@ -3,12 +3,16 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedRecordDot #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Handler.Home where
 
 import Import
 import Text.Julius (RawJS (..))
 import Yesod.Form.Bootstrap3 (BootstrapFormLayout (..), renderBootstrap3)
+
+import qualified Service.App
 
 -- Define our data that will be used for creating the form.
 data FileForm = FileForm
@@ -29,6 +33,11 @@ getHomeR = do
   let submission = Nothing :: Maybe FileForm
       handlerName = "getHomeR" :: Text
   allComments <- runDB $ getAllComments
+
+  app <- getYesod
+  let Service.App.Services{..} = app.appServices
+  liftIO $ userService.printHello
+  liftIO $ commentService.printComments
 
   defaultLayout $ do
     let (commentFormId, commentTextareaId, commentListId) = commentIds

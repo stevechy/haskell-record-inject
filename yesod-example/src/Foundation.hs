@@ -25,6 +25,8 @@ import Yesod.Core.Types (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
 import Yesod.Default.Util (addStaticContentExternal)
 
+import qualified Service.App
+
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
 -- starts running, such as database connections. Every handler will have
@@ -36,7 +38,8 @@ data App = App
     -- | Database connection pool.
     appConnPool :: ConnectionPool,
     appHttpManager :: Manager,
-    appLogger :: Logger
+    appLogger :: Logger,
+    appServices :: Service.App.Services
   }
 
 data MenuItem = MenuItem

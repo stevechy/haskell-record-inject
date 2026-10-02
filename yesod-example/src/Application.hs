@@ -25,12 +25,16 @@ module Application
 where
 
 import Control.Monad.Logger (liftLoc, runLoggingT)
+import qualified Control.Exception
+import Data.Function ((&))
+import qualified Data.Injector
 import Database.Persist.Sqlite
   ( createSqlitePool,
     runSqlPool,
     sqlDatabase,
     sqlPoolSize,
   )
+import qualified Db.Pool
 import Handler.Comment
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
@@ -59,6 +63,7 @@ import Network.Wai.Middleware.RequestLogger
     mkRequestLogger,
     outputFormat,
   )
+import qualified Service.App
 import System.Log.FastLogger
   ( defaultBufSize,
     newStdoutLoggerSet,
@@ -89,7 +94,7 @@ makeFoundation appSettings = do
   -- logging function. To get out of this loop, we initially create a
   -- temporary foundation without a real connection pool, get a log function
   -- from there, and then create the real foundation.
-  let mkFoundation appConnPool = App {..}
+  let mkFoundation appConnPool = App {appServices = error "appServices forced in tempFoundation", ..}
       -- The App {..} syntax is an example of record wild cards. For more
       -- information, see:
       -- https://ocharles.org.uk/blog/posts/2014-12-04-record-wildcards.html
@@ -106,8 +111,17 @@ makeFoundation appSettings = do
   -- Perform database migration using our application's logging settings.
   runLoggingT (runSqlPool (runMigration migrateAll) pool) logFunc
 
-  -- Return the foundation
-  return $ mkFoundation pool
+  let injectorConfig =
+        Data.Injector.emptyConfig
+          -- & (Data.Injector.addProvider Service.App.otherUserServiceProvider)
+          & (Data.Injector.addProvider $ Data.Injector.provideValue Db.Pool.SqlDbPool {sqlDbPool = pool})
+          & id
+  injector <- Data.Injector.newInjector injectorConfig
+  injectedServices <- (Data.Injector.getInstance injector) :: IO (Either Data.Injector.InjectionError Service.App.Services)
+  case injectedServices of
+    Left err -> Control.Exception.throw err
+    Right resolvedServices -> return $ (mkFoundation pool) {appServices = resolvedServices}
+
 
 -- | Convert our foundation to a WAI Application by calling @toWaiAppPlain@ and
 -- applying some additional middlewares.
