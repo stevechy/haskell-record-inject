@@ -1,0 +1,74 @@
+cabal-version: 2.2
+
+-- This file has been generated from package.yaml by hpack version 0.39.6.
+--
+-- see: https://github.com/sol/hpack
+
+name:           record-inject
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/record-inject#readme>
+homepage:       https://github.com/stevechy/record-inject#readme
+bug-reports:    https://github.com/stevechy/record-inject/issues
+author:         Steven Cheng Hum Yuen
+maintainer:     example@example.com
+copyright:      Copyright (c) 2026 Steven Cheng Hum Yuen
+license:        BSD-3-Clause
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/stevechy/record-inject
+
+library
+  exposed-modules:
+      Data.Injector
+      Data.Injector.TH
+  other-modules:
+      Paths_record_inject
+  autogen-modules:
+      Paths_record_inject
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -dth-dec-file
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , template-haskell
+  default-language: Haskell2010
+
+executable record-inject-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_record_inject
+  autogen-modules:
+      Paths_record_inject
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -dth-dec-file -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , record-inject
+    , template-haskell
+  default-language: Haskell2010
+
+test-suite record-inject-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_record_inject
+  autogen-modules:
+      Paths_record_inject
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -dth-dec-file -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , record-inject
+    , template-haskell
+  default-language: Haskell2010
